@@ -88,7 +88,7 @@ void ParallelEEPROM::write(uint16_t address, byte data) {
   digitalWrite(_LVC245_OE, HIGH);
   setDataInputMode();
   _lastAddressWritten = address;
-  _lastByteWritten    = byte;
+  _lastByteWritten    = data;
 }
 
 // This method uses Data Polling to check if prevous write

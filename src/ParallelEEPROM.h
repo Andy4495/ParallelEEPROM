@@ -24,6 +24,8 @@ public:
   byte read(uint16_t address);
   void writeWithPolling(uint16_t address, byte data);
   byte readWithPolling(uint16_t address);
+  void writeWithTogglePolling(uint16_t address, byte data);
+  byte readWithTogglePolling(uint16_t address);
 
 private:
   enum {NO_PIN = 255};
