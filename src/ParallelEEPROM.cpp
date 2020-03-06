@@ -3,6 +3,7 @@
    https://github.com/Andy4495/ParallelEEPROM
 
    03/05/20 - A.T. - Original
+   03/06/20 - A.T. - Use a separate flag to indicate the first write to EEPROM
 
 */
 
@@ -42,7 +43,7 @@ ParallelEEPROM::ParallelEEPROM(byte A14, byte A13, byte A12, byte A11, byte A10,
   _EEPROM_WE  = EEPROM_WE;
   _LVC245_OE  = LVC_245_OE;
   _LVC245_DIR = LVC_245_DIR;
-  _lastAddressWritten = 0xFFFF; // Use 0xFFFF as flag that we haven't written anything yet. This won't work if we start supporting 28C512 chips.
+  _isThisTheFirstWrite = true;
 }
 
 // 28C16 with 74LVC245 transceiver
@@ -79,7 +80,7 @@ ParallelEEPROM::ParallelEEPROM(byte A10, byte A9, byte A8,
   _EEPROM_WE  = EEPROM_WE;
   _LVC245_OE  = LVC_245_OE;
   _LVC245_DIR = LVC_245_DIR;
-  _lastAddressWritten = 0xFFFF; // Use 0xFFFF as flag that we haven't written anything yet. This won't work if we start supporting 28C512 chips.
+  _isThisTheFirstWrite = true;
 }
 
 // 28C256/X28256 direct connect to microprocessor (no transceiver on data bus)
@@ -115,7 +116,7 @@ ParallelEEPROM::ParallelEEPROM(byte A14, byte A13, byte A12, byte A11, byte A10,
   _EEPROM_WE  = EEPROM_WE;
   _LVC245_OE  = NO_PIN;
   _LVC245_DIR = NO_PIN;
-  _lastAddressWritten = 0xFFFF; // Use 0xFFFF as flag that we haven't written anything yet. This won't work if we start supporting 28C512 chips.
+  _isThisTheFirstWrite = true;
 }
 
 // 28C16 direct connect to microprocessor (no transceiver on data bus)
@@ -152,7 +153,7 @@ ParallelEEPROM::ParallelEEPROM(byte A10, byte A9, byte A8,
   _EEPROM_WE  = EEPROM_WE;
   _LVC245_OE  = NO_PIN;
   _LVC245_DIR = NO_PIN;
-  _lastAddressWritten = 0xFFFF; // Use 0xFFFF as flag that we haven't written anything yet. This won't work if we start supporting 28C512 chips.
+  _isThisTheFirstWrite = true;
 }
 
 void ParallelEEPROM::begin() {
@@ -179,11 +180,16 @@ void ParallelEEPROM::begin() {
   }
 }
 
+// This method does not include any delays or checks to see if a previous
+// write completed before starting a new write. The sketch calling this
+// method will need to add the appropriate delay (as defined in the device
+// datasheet) after every call to write().
 void ParallelEEPROM::write(uint16_t address, byte data) {
   int i;
 
   _lastAddressWritten = address;
   _lastByteWritten    = data;
+  _isThisTheFirstWrite = false;
   setAddressLines(address);
   setDataOutputMode();
   if (_LVC245_DIR != NO_PIN) digitalWrite(_LVC245_DIR, LOW);
@@ -208,11 +214,11 @@ void ParallelEEPROM::write(uint16_t address, byte data) {
 
 // This method uses Data Polling to check if prevous write
 // cycle completed before starting another write.
+// Check the device datasheet to see if Data Polling is supported.
 // When using this method, no explicit delays are required after writes.
 void ParallelEEPROM::writeWithPolling(uint16_t address, byte data) {
   // First check if this is the first write to the chip.
-  // NOTE: This implementation will need to change if this library ever supports 28C512 chips
-  if (_lastAddressWritten != 0xFFFF) {
+  if (_isThisTheFirstWrite == false) {
     // Check if bit 7 is the complement of previous written bit.
     // Once bit 7 is correct, then write may proceed.
     while ((read(_lastAddressWritten) & 0x80) != (_lastByteWritten & 0x80) ) ;
@@ -222,6 +228,7 @@ void ParallelEEPROM::writeWithPolling(uint16_t address, byte data) {
 
 // This method uses Toggle Bit Polling to check if prevous write
 // cycle completed before starting another write.
+// Check the device datasheet to see if Toggle Polling is supported.
 // When using this method, no explicit delays are required after writes.
 void ParallelEEPROM::writeWithTogglePolling(uint16_t address, byte data) {
   byte prevData, currentData;
@@ -236,6 +243,11 @@ void ParallelEEPROM::writeWithTogglePolling(uint16_t address, byte data) {
   write(address, data);
 }
 
+// This method does not include any delays or checks to see if a previous
+// write completed before attempting a read. The sketch calling this
+// method will need to add the appropriate delay (as defined in the device
+// datasheet) after any previous call to write() to ensure that valid
+// data is read when using this method.
 byte ParallelEEPROM::read(uint16_t address) {
   byte data = 0;
 
@@ -247,7 +259,6 @@ byte ParallelEEPROM::read(uint16_t address) {
   // The digitalWrites that follow easily make a > 250 ns delay
   if (_LVC245_DIR != NO_PIN) digitalWrite(_LVC245_DIR, HIGH);
   if (_LVC245_OE != NO_PIN) digitalWrite(_LVC245_OE, LOW);
-  //delayMicroseconds(3);
 
   if (digitalRead(_Data[7]) == HIGH) data |= 0x80;
   if (digitalRead(_Data[6]) == HIGH) data |= 0x40;
@@ -268,11 +279,11 @@ byte ParallelEEPROM::read(uint16_t address) {
 
 // This method uses Data Polling to check if prevous write
 // cycle completed before reading.
+// Check the device datasheet to see if Data Polling is supported.
 // When using this method, no explicit delays are required after writes.
 byte ParallelEEPROM::readWithPolling(uint16_t address) {
   // First check if there has been a write to the chip.
-  // NOTE: This implementation will need to change if this library ever supports 28C512 chips
-  if (_lastAddressWritten != 0xFFFF) {
+  if (_isThisTheFirstWrite == false) {
     // Check if bit 7 is the complement of previous written bit.
     // Once bit 7 is correct, then write may proceed.
     while ((read(_lastAddressWritten) & 0x80) != (_lastByteWritten & 0x80) ) ;
@@ -282,6 +293,7 @@ byte ParallelEEPROM::readWithPolling(uint16_t address) {
 
 // This method uses Toggle Bit Polling to check if prevous write
 // cycle completed before trying to read the EEPROM.
+// Check the device datasheet to see if Toggle Polling is supported.
 // When using this method, no explicit delays are required after writes.
 byte ParallelEEPROM::readWithTogglePolling(uint16_t address) {
   byte prevData, currentData;

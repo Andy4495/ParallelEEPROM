@@ -3,6 +3,7 @@
    https://github.com/Andy4495/ParallelEEPROM
 
    03/05/20 - A.T. - Original
+   03/06/20 - A.T. - Use a separate flag to indicate the first write to EEPROM
 
 */
 
@@ -58,6 +59,7 @@ private:
   byte _LVC245_OE, _LVC245_DIR;
   byte _lastByteWritten;
   uint16_t _lastAddressWritten;
+  bool _isThisTheFirstWrite;    // Set to true in constructor, set to false after a write
 
   void setAddressLines(uint16_t address);
   void setDataOutputMode();
