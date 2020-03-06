@@ -7,12 +7,13 @@
 */
 
 #include "ParallelEEPROM.h"
-ParallelEEPROM::ParallelEEPROM(byte A14, byte A13, byte A12, byte A11, byte A10, byte A9, byte A8,
-                                   byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
-                                   byte  D7, byte  D6, byte  D5, byte  D4, byte  D3, byte D2, byte D1, byte D0,
-                                   byte  EEPROM_CE, byte EEPROM_OE, byte EEPROM_WE,
-                                   byte  LVC_245_OE, byte LVC_245_DIR) {
 
+// 28C256/X28256 with 74LVC245 transceiver
+ParallelEEPROM::ParallelEEPROM(byte A14, byte A13, byte A12, byte A11, byte A10, byte A9, byte A8,
+                               byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
+                               byte  D7, byte  D6, byte  D5, byte  D4, byte  D3, byte D2, byte D1, byte D0,
+                               byte  EEPROM_CE, byte EEPROM_OE, byte EEPROM_WE,
+                               byte  LVC_245_OE, byte LVC_245_DIR) {
   _Addr[14] = A14;
   _Addr[13] = A13;
   _Addr[12] = A12;
@@ -44,11 +45,121 @@ ParallelEEPROM::ParallelEEPROM(byte A14, byte A13, byte A12, byte A11, byte A10,
   _lastAddressWritten = 0xFFFF; // Use 0xFFFF as flag that we haven't written anything yet. This won't work if we start supporting 28C512 chips.
 }
 
+// 28C16 with 74LVC245 transceiver
+ParallelEEPROM::ParallelEEPROM(byte A10, byte A9, byte A8,
+                               byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
+                               byte  D7, byte  D6, byte  D5, byte  D4, byte  D3, byte D2, byte D1, byte D0,
+                               byte  EEPROM_CE, byte EEPROM_OE, byte EEPROM_WE,
+                               byte  LVC_245_OE, byte LVC_245_DIR) {
+  _Addr[14] = NO_PIN;
+  _Addr[13] = NO_PIN;
+  _Addr[12] = NO_PIN;
+  _Addr[11] = NO_PIN;
+  _Addr[10] = A10;
+  _Addr[9]  = A9;
+  _Addr[8]  = A8;
+  _Addr[7]  = A7;
+  _Addr[6]  = A6;
+  _Addr[5]  = A5;
+  _Addr[4]  = A4;
+  _Addr[3]  = A3;
+  _Addr[2]  = A2;
+  _Addr[1]  = A1;
+  _Addr[0]  = A0;
+  _Data[7]  = D7;
+  _Data[6]  = D6;
+  _Data[5]  = D5;
+  _Data[4]  = D4;
+  _Data[3]  = D3;
+  _Data[2]  = D2;
+  _Data[1]  = D1;
+  _Data[0]  = D0;
+  _EEPROM_CE  = EEPROM_CE;
+  _EEPROM_OE  = EEPROM_OE;
+  _EEPROM_WE  = EEPROM_WE;
+  _LVC245_OE  = LVC_245_OE;
+  _LVC245_DIR = LVC_245_DIR;
+  _lastAddressWritten = 0xFFFF; // Use 0xFFFF as flag that we haven't written anything yet. This won't work if we start supporting 28C512 chips.
+}
+
+// 28C256/X28256 direct connect to microprocessor (no transceiver on data bus)
+ParallelEEPROM::ParallelEEPROM(byte A14, byte A13, byte A12, byte A11, byte A10, byte A9, byte A8,
+                               byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
+                               byte  D7, byte  D6, byte  D5, byte  D4, byte  D3, byte D2, byte D1, byte D0,
+                               byte  EEPROM_CE, byte EEPROM_OE, byte EEPROM_WE) {
+  _Addr[14] = A14;
+  _Addr[13] = A13;
+  _Addr[12] = A12;
+  _Addr[11] = A11;
+  _Addr[10] = A10;
+  _Addr[9]  = A9;
+  _Addr[8]  = A8;
+  _Addr[7]  = A7;
+  _Addr[6]  = A6;
+  _Addr[5]  = A5;
+  _Addr[4]  = A4;
+  _Addr[3]  = A3;
+  _Addr[2]  = A2;
+  _Addr[1]  = A1;
+  _Addr[0]  = A0;
+  _Data[7]  = D7;
+  _Data[6]  = D6;
+  _Data[5]  = D5;
+  _Data[4]  = D4;
+  _Data[3]  = D3;
+  _Data[2]  = D2;
+  _Data[1]  = D1;
+  _Data[0]  = D0;
+  _EEPROM_CE  = EEPROM_CE;
+  _EEPROM_OE  = EEPROM_OE;
+  _EEPROM_WE  = EEPROM_WE;
+  _LVC245_OE  = NO_PIN;
+  _LVC245_DIR = NO_PIN;
+  _lastAddressWritten = 0xFFFF; // Use 0xFFFF as flag that we haven't written anything yet. This won't work if we start supporting 28C512 chips.
+}
+
+// 28C16 direct connect to microprocessor (no transceiver on data bus)
+ParallelEEPROM::ParallelEEPROM(byte A10, byte A9, byte A8,
+              byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
+              byte  D7, byte  D6, byte  D5, byte  D4, byte  D3, byte D2, byte D1, byte D0,
+              byte  EEPROM_CE, byte EEPROM_OE, byte EEPROM_WE) {
+
+  _Addr[14] = NO_PIN;
+  _Addr[13] = NO_PIN;
+  _Addr[12] = NO_PIN;
+  _Addr[11] = NO_PIN;
+  _Addr[10] = A10;
+  _Addr[9]  = A9;
+  _Addr[8]  = A8;
+  _Addr[7]  = A7;
+  _Addr[6]  = A6;
+  _Addr[5]  = A5;
+  _Addr[4]  = A4;
+  _Addr[3]  = A3;
+  _Addr[2]  = A2;
+  _Addr[1]  = A1;
+  _Addr[0]  = A0;
+  _Data[7]  = D7;
+  _Data[6]  = D6;
+  _Data[5]  = D5;
+  _Data[4]  = D4;
+  _Data[3]  = D3;
+  _Data[2]  = D2;
+  _Data[1]  = D1;
+  _Data[0]  = D0;
+  _EEPROM_CE  = EEPROM_CE;
+  _EEPROM_OE  = EEPROM_OE;
+  _EEPROM_WE  = EEPROM_WE;
+  _LVC245_OE  = NO_PIN;
+  _LVC245_DIR = NO_PIN;
+  _lastAddressWritten = 0xFFFF; // Use 0xFFFF as flag that we haven't written anything yet. This won't work if we start supporting 28C512 chips.
+}
+
 void ParallelEEPROM::begin() {
   byte i;
 
   for (i = 0; i < NUM_ADDR_LINES; i++) {
-    pinMode(_Addr[i], OUTPUT);
+    if (_Addr[i] != NO_PIN) pinMode(_Addr[i], OUTPUT);
   }
 
   setDataInputMode();
@@ -58,10 +169,14 @@ void ParallelEEPROM::begin() {
   digitalWrite(_EEPROM_OE, HIGH);
   pinMode(_EEPROM_WE, OUTPUT);
   digitalWrite(_EEPROM_WE, HIGH);
-  digitalWrite(_LVC245_OE, HIGH);
-  pinMode(_LVC245_OE, OUTPUT);
-  pinMode(_LVC245_DIR, OUTPUT);
-  digitalWrite(_LVC245_DIR, HIGH);
+  if (_LVC245_OE != NO_PIN) {
+    digitalWrite(_LVC245_OE, HIGH);
+    pinMode(_LVC245_OE, OUTPUT);
+  }
+  if (_LVC245_DIR != NO_PIN) {
+    pinMode(_LVC245_DIR, OUTPUT);
+    digitalWrite(_LVC245_DIR, HIGH);
+  }
 }
 
 void ParallelEEPROM::write(uint16_t address, byte data) {
@@ -69,8 +184,8 @@ void ParallelEEPROM::write(uint16_t address, byte data) {
 
   setAddressLines(address);
   setDataOutputMode();
-  digitalWrite(_LVC245_DIR, LOW);
-  digitalWrite(_LVC245_OE, LOW);
+  if (_LVC245_DIR != NO_PIN) digitalWrite(_LVC245_DIR, LOW);
+  if (_LVC245_OE != NO_PIN) digitalWrite(_LVC245_OE, LOW);
   for (i = 0; i < NUM_DATA_LINES; i++) {
     if (data & 0x01) digitalWrite(_Data[i], HIGH);
     else digitalWrite(_Data[i], LOW);
@@ -85,7 +200,7 @@ void ParallelEEPROM::write(uint16_t address, byte data) {
   // tCH min 0 ns (no delay needed)
   digitalWrite(_EEPROM_CE, HIGH);
   // No delay needed, data already read above
-  digitalWrite(_LVC245_OE, HIGH);
+  if (_LVC245_OE != NO_PIN) digitalWrite(_LVC245_OE, HIGH);
   setDataInputMode();
   _lastAddressWritten = address;
   _lastByteWritten    = data;
@@ -130,8 +245,8 @@ byte ParallelEEPROM::read(uint16_t address) {
   digitalWrite(_EEPROM_OE, LOW);
   // tOE: Need at least 100 ns after OE low before reading data
   // The digitalWrites that follow easily make a > 250 ns delay
-  digitalWrite(_LVC245_DIR, HIGH);
-  digitalWrite(_LVC245_OE, LOW);
+  if (_LVC245_DIR != NO_PIN) digitalWrite(_LVC245_DIR, HIGH);
+  if (_LVC245_OE != NO_PIN) digitalWrite(_LVC245_OE, LOW);
   //delayMicroseconds(3);
 
   if (digitalRead(_Data[7]) == HIGH) data |= 0x80;
@@ -143,7 +258,7 @@ byte ParallelEEPROM::read(uint16_t address) {
   if (digitalRead(_Data[1]) == HIGH) data |= 0x02;
   if (digitalRead(_Data[0]) == HIGH) data |= 0x01;
 
-  digitalWrite(_LVC245_OE, HIGH);
+  if (_LVC245_OE != NO_PIN) digitalWrite(_LVC245_OE, HIGH);
   digitalWrite(_EEPROM_OE, HIGH);
   digitalWrite(_EEPROM_CE, HIGH);
 
@@ -184,10 +299,10 @@ byte ParallelEEPROM::readWithTogglePolling(uint16_t address) {
 void ParallelEEPROM::setAddressLines(uint16_t address) {
   int i;
 
-  (address & 0x4000) ? digitalWrite(_Addr[14], HIGH) : digitalWrite(_Addr[14], LOW);
-  (address & 0x2000) ? digitalWrite(_Addr[13], HIGH) : digitalWrite(_Addr[13], LOW);
-  (address & 0x1000) ? digitalWrite(_Addr[12], HIGH) : digitalWrite(_Addr[12], LOW);
-  (address & 0x0800) ? digitalWrite(_Addr[11], HIGH) : digitalWrite(_Addr[11], LOW);
+  if (_Addr[14] != NO_PIN) (address & 0x4000) ? digitalWrite(_Addr[14], HIGH) : digitalWrite(_Addr[14], LOW);
+  if (_Addr[13] != NO_PIN) (address & 0x2000) ? digitalWrite(_Addr[13], HIGH) : digitalWrite(_Addr[13], LOW);
+  if (_Addr[12] != NO_PIN) (address & 0x1000) ? digitalWrite(_Addr[12], HIGH) : digitalWrite(_Addr[12], LOW);
+  if (_Addr[11] != NO_PIN) (address & 0x0800) ? digitalWrite(_Addr[11], HIGH) : digitalWrite(_Addr[11], LOW);
   (address & 0x0400) ? digitalWrite(_Addr[10], HIGH) : digitalWrite(_Addr[10], LOW);
   (address & 0x0200) ? digitalWrite(_Addr[9],  HIGH) : digitalWrite(_Addr[9],  LOW);
   (address & 0x0100) ? digitalWrite(_Addr[8],  HIGH) : digitalWrite(_Addr[8],  LOW);
@@ -199,14 +314,6 @@ void ParallelEEPROM::setAddressLines(uint16_t address) {
   (address & 0x0004) ? digitalWrite(_Addr[2],  HIGH) : digitalWrite(_Addr[2],  LOW);
   (address & 0x0002) ? digitalWrite(_Addr[1],  HIGH) : digitalWrite(_Addr[1],  LOW);
   (address & 0x0001) ? digitalWrite(_Addr[0],  HIGH) : digitalWrite(_Addr[0],  LOW);
-
-/*
-  for (i = 0; i < NUM_ADDR_LINES; i++) {
-    if (address & 0x01) digitalWrite(_Addr[i], HIGH);
-    else digitalWrite(_Addr[i], LOW);
-    address = address >> 1;
-  }
-  */
 }
 
 void ParallelEEPROM::setDataOutputMode() {
