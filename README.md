@@ -3,7 +3,7 @@ ParallelEEPROM Library
 
 This is a parallel EEPROM programmer library. It currently supports 32Kx8 (28C256 and X28256) and 2Kx8 (28C16) EEPROMs. Other sizes may be supported in the future.
 
-It has been tested with a 3.3V MSP432 microcontroller, and therefore also supports an optional 74LVC245 transceiver to level-shift the data signals between the EEPROM and the MSP432.
+The library has been tested with a 3.3V MSP432 microcontroller, and therefore also supports an optional 74LVC245 transceiver to level-shift the data signals between the EEPROM and the MSP432.
 
 Since this is intended for a parallel EEPROM device, a large number of I/O pins are required. For example, with 28C256 devices and a 74LVC245 transceiver, a total of 28 I/O pins are required (15 address, 8 data, and 5 control pins). In addition, a large amount of program memory is required to hold to EEPROM program data. For this reason, this library was only tested on MPS432, but may work with other microcontrollers with sufficient program memory and I/O.
 
@@ -11,9 +11,7 @@ After a write operation, reads and writes will not return valid data until the w
 
 DATA polling uses the most significant data bit (IO7) to signal when a write operation has completed. TOGGLE polling uses IO6. For details on how polling works and which polling method is supported, see the specific device datasheet.
 
-The library currently supports single-byte reads and writes.
-
-Future updates may include support for multi-byte reads and page writes.
+The library currently supports single-byte reads and writes. Future updates may include support for multi-byte reads and page writes.
 
 Usage
 -----
@@ -24,15 +22,43 @@ First, **include** the library header file:
 
     #include <ParallelEEPROM.h>
 
-Next, **instantiate** an ParallelEEPROM object:
+Next, **instantiate** an ParallelEEPROM object. The constructor used depends on the EEPROM type and whether you are using a 74LVC245 or similar transceiver on the data lines:
 
+1. 28C256/X28256 with 74LVC245:
+```
     ParallelEEPROM eep(byte A14, byte A13, byte A12, byte A11, byte A10, byte A9, byte A8,
-                         byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
-                         byte  D7, byte  D6, byte  D5, byte  D4, byte  D3, byte D2, byte D1, byte D0,
-                         byte  EEPROM_CE, byte EEPROM_OE, byte EEPROM_WE,
-                         byte  245_OE, byte 245_DIR);
+                       byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
+                       byte  D7, byte  D6, byte  D5, byte  D4, byte  D3, byte D2, byte D1, byte D0,
+                       byte  EEPROM_CE, byte EEPROM_OE, byte EEPROM_WE,
+                       byte  245_OE, byte 245_DIR);
+```
 
-The constructor parameters are the pin numbers for the 15 address pins on the EEPROM, 8 data pins (B side) on the 74LVC245, control pins for the EEPROM (CE, OE, WE), and control pins for the 74LVC245 (OE and DIR). Note that the library assumes that the A side of the 74LVC245 is connected to the EEPROM, and the B side is connected to the MSP432.
+2. 28C16 with 74LVC245:
+```
+    ParallelEEPROM eep(byte A10, byte A9, byte A8,
+                       byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
+                       byte  D7, byte  D6, byte  D5, byte  D4, byte  D3, byte D2, byte D1, byte D0,
+                       byte  EEPROM_CE, byte EEPROM_OE, byte EEPROM_WE,
+                       byte  245_OE, byte 245_DIR);
+```
+
+3. 28C256/X28256 without 74LVC245:
+```
+    ParallelEEPROM eep(byte A14, byte A13, byte A12, byte A11, byte A10, byte A9, byte A8,
+                       byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
+                       byte  D7, byte  D6, byte  D5, byte  D4, byte  D3, byte D2, byte D1, byte D0,
+                       byte  EEPROM_CE, byte EEPROM_OE, byte EEPROM_WE);
+```
+
+4. 28C16 without 74LVC245:
+```
+    ParallelEEPROM eep(byte A10, byte A9, byte A8,
+                       byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
+                       byte  D7, byte  D6, byte  D5, byte  D4, byte  D3, byte D2, byte D1, byte D0,
+                       byte  EEPROM_CE, byte EEPROM_OE, byte EEPROM_WE);
+```
+
+The constructor parameters are the pin numbers for up to 15 address pins on the EEPROM, 8 data pins 74LVC245 (B side) or directly connected to EEPROM, control pins for the EEPROM (CE, OE, WE), and control pins for the 74LVC245 (OE and DIR) if used. Note that the library assumes that the A side of the 74LVC245 is connected to the EEPROM, and the B side is connected to the MSP432.
 
 Then **initialize** the object (typically within `setup()`):
 
@@ -70,7 +96,6 @@ Each chip should have a 0.1 uF decoupling capacitor connected between Vcc and GN
 
 When using a 74LVC245 or other transceiver, the library assumes that the A side of the 74LVC245 is connected to the EEPROM data lines, and the B side is connected to the microcontroller.
 
-In order to support both 28C256 and 28C16, the programming hardware needs to account for slightly different pinouts between the chips. In particular, the 28C256/X28256 has 28 pins and the 28C16 has 24. Pin 26 is an address pin on the 28C256/X28256, which corresponds to Vcc pin 24 on the 28C16. The programming hardware therefore has a jumper at pin 26/24 so that A13 can be selected when using a 28 pin device, and Vcc can be selected when using a 24 pin device. 
 
 In other words, connect as follows:
 ```
@@ -85,6 +110,8 @@ EEPROM Pin  74LVC245 Pin  Chip Signal Name
     12           8          I/O1 <-> A7
     11           9          I/O0 <-> A8
 ```
+
+In order to support both 28C256 and 28C16, the programming hardware needs to account for slightly different pinouts between the chips. In particular, the 28C256/X28256 has 28 pins and the 28C16 has 24. Pin 26 is an address pin on the 28C256/X28256, which corresponds to Vcc pin 24 on the 28C16. The programming hardware therefore has a jumper at pin 26/24 so that A13 can be selected when using a 28 pin device, and Vcc can be selected when using a 24 pin device.
 
 References
 ---------------------
