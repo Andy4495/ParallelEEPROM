@@ -182,6 +182,8 @@ void ParallelEEPROM::begin() {
 void ParallelEEPROM::write(uint16_t address, byte data) {
   int i;
 
+  _lastAddressWritten = address;
+  _lastByteWritten    = data;
   setAddressLines(address);
   setDataOutputMode();
   if (_LVC245_DIR != NO_PIN) digitalWrite(_LVC245_DIR, LOW);
@@ -202,8 +204,6 @@ void ParallelEEPROM::write(uint16_t address, byte data) {
   // No delay needed, data already read above
   if (_LVC245_OE != NO_PIN) digitalWrite(_LVC245_OE, HIGH);
   setDataInputMode();
-  _lastAddressWritten = address;
-  _lastByteWritten    = data;
 }
 
 // This method uses Data Polling to check if prevous write

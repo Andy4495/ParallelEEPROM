@@ -70,6 +70,8 @@ Each chip should have a 0.1 uF decoupling capacitor connected between Vcc and GN
 
 When using a 74LVC245 or other transceiver, the library assumes that the A side of the 74LVC245 is connected to the EEPROM data lines, and the B side is connected to the microcontroller.
 
+In order to support both 28C256 and 28C16, the programming hardware needs to account for slightly different pinouts between the chips. In particular, the 28C256/X28256 has 28 pins and the 28C16 has 24. Pin 26 is an address pin on the 28C256/X28256, which corresponds to Vcc pin 24 on the 28C16. The programming hardware therefore has a jumper at pin 26/24 so that A13 can be selected when using a 28 pin device, and Vcc can be selected when using a 24 pin device. 
+
 In other words, connect as follows:
 ```
 EEPROM Pin  74LVC245 Pin  Chip Signal Name
