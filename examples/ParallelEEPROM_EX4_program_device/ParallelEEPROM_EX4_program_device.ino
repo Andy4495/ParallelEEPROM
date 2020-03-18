@@ -122,9 +122,11 @@ void loop() {
     Serial.println("Verification Passed.");
     digitalWrite(LED_GREEN, HIGH);
     delay(500);
-    digitalWrite(LED_GREEN, HIGH);
+    digitalWrite(LED_GREEN, LOW);
     delay(500);
     digitalWrite(LED_GREEN, HIGH);
+    delay(500);
+    digitalWrite(LED_GREEN, LOW);
     delay(500);
     digitalWrite(LED_GREEN, HIGH);
 
