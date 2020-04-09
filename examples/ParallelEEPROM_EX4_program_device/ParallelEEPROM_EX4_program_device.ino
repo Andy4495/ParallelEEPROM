@@ -119,6 +119,8 @@ void loop() {
     digitalWrite(LED_RED, HIGH);
   }
   else {
+    Serial.print("Bytes written: ");
+    Serial.println(data_size);
     Serial.println("Verification Passed.");
     digitalWrite(LED_GREEN, HIGH);
     delay(500);
