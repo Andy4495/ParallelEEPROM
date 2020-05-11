@@ -1,13 +1,15 @@
 ParallelEEPROM Library
 ==========================
 
-This is a parallel EEPROM programmer library. It currently supports 32Kx8 (28C256 and X28256) and 2Kx8 (28C16) EEPROMs. Other sizes may be supported in the future.
+This is a parallel EEPROM programmer library. It currently supports 32Kx8 (28C256 and X28256) and 2Kx8 (28C16) EEPROMs. 32Kx8 and 2Kx8 chips with the same pinout as these devices have not been tested, but will probably work with this library. Other sizes may be supported in the future.  
+
+Example program 4 in the `examples` folder (`ParallelEEPROM_EX4_program_device.ino`) implements an EEPROM programmer device, complete with Serial output text indicating the data programmed and pass/fail status.
 
 The library has been tested with a 3.3V MSP432 microcontroller, and therefore also supports an optional 74LVC245 transceiver to level-shift the data signals between the EEPROM and the MSP432.
 
 Since this is intended for a parallel EEPROM device, a large number of I/O pins are required. For example, with 28C256 devices and a 74LVC245 transceiver, a total of 28 I/O pins are required (15 address, 8 data, and 5 control pins). In addition, a large amount of program memory is required to hold to EEPROM program data. For this reason, this library was only tested on MPS432, but may work with other microcontrollers with sufficient program memory and I/O.
 
-After a write operation, reads and writes will not return valid data until the write cycle has completed. The library supports both DATA polling and TOGGLE polling to detect the completion of a write cycle so that hard-coded delays are not required. Since not all chips support the different polling types, methods are provided which support no polling (requiring a hard-coded delay after writes), DATA polling, or TOGGLE polling.
+After a write operation to the EEPROM, reads from and writes to the EEPROM will not return valid data until the previous write operation has completed. The library supports both DATA polling and TOGGLE polling to detect the completion of a write cycle so that hard-coded delays in the sketch are not required. Since not all chips support the different polling types, methods are provided which support no polling (requiring a hard-coded delay after writes), DATA polling, or TOGGLE polling.
 
 DATA polling uses the most significant data bit (IO7) to signal when a write operation has completed. TOGGLE polling uses IO6. For details on how polling works and which polling method is supported, see the specific device datasheet.
 
@@ -24,7 +26,7 @@ First, **include** the library header file:
 
 Next, **instantiate** an ParallelEEPROM object. The constructor used depends on the EEPROM type and whether you are using a 74LVC245 or similar transceiver on the data lines:
 
-1. 28C256/X28256 with 74LVC245:
+1. 32KB device (28C256/X28256) with 74LVC245:
 ```
     ParallelEEPROM eep(byte A14, byte A13, byte A12, byte A11, byte A10, byte A9, byte A8,
                        byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
@@ -33,7 +35,7 @@ Next, **instantiate** an ParallelEEPROM object. The constructor used depends on 
                        byte  245_OE, byte 245_DIR);
 ```
 
-2. 28C16 with 74LVC245:
+2. 2KB device (28C16) with 74LVC245:
 ```
     ParallelEEPROM eep(byte A10, byte A9, byte A8,
                        byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
@@ -42,7 +44,7 @@ Next, **instantiate** an ParallelEEPROM object. The constructor used depends on 
                        byte  245_OE, byte 245_DIR);
 ```
 
-3. 28C256/X28256 without 74LVC245:
+3. 32KB device (28C256/X28256) without 74LVC245:
 ```
     ParallelEEPROM eep(byte A14, byte A13, byte A12, byte A11, byte A10, byte A9, byte A8,
                        byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
@@ -50,7 +52,7 @@ Next, **instantiate** an ParallelEEPROM object. The constructor used depends on 
                        byte  EEPROM_CE, byte EEPROM_OE, byte EEPROM_WE);
 ```
 
-4. 28C16 without 74LVC245:
+4. 2KB device (28C16) without 74LVC245:
 ```
     ParallelEEPROM eep(byte A10, byte A9, byte A8,
                        byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
