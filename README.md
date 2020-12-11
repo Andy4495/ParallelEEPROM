@@ -5,6 +5,8 @@ This is a parallel EEPROM programmer library. It currently supports 32Kx8 (28C25
 
 Example program 4 in the `examples` folder (`ParallelEEPROM_EX4_program_device.ino`) implements an EEPROM programmer device, complete with Serial output text indicating the data programmed and pass/fail status.
 
+Example program 5 in the `examples` folder (`ParallelEEPROM_EX5_RAM_Test.ino`) implements an external parallel RAM test. Since a RAM chip has the same pinout and generally the same signaling structure as an EEPROM, this library can also be used to verify that a RAM Chip is functioning normally.
+
 The library has been tested with a 3.3V MSP432 microcontroller, and therefore also supports an optional 74LVC245 transceiver to level-shift the data signals between the EEPROM and the MSP432.
 
 Since this is intended for a parallel EEPROM device, a large number of I/O pins are required. For example, with 28C256 devices and a 74LVC245 transceiver, a total of 28 I/O pins are required (15 address, 8 data, and 5 control pins). In addition, a large amount of program memory is required to hold to EEPROM program data. For this reason, this library was only tested on MPS432, but may work with other microcontrollers with sufficient program memory and I/O.
@@ -122,8 +124,10 @@ References
 + Atmel 28C256 [datasheet][3]
 + Atmel 28C16 [datasheet][4]
 + TI 74LVC245 [datasheet][2]
++ Parallel RAM 62256 (32K x 8 bit) [datasheet][5]
 
 [1]:http://www.bgmicro.com/pdf/x28256.pdf
 [2]:https://www.ti.com/lit/ds/symlink/sn74lvc245a.pdf
 [3]:http://ww1.microchip.com/downloads/en/DeviceDoc/doc0006.pdf
 [4]:https://www.jameco.com/Jameco/Products/ProdDS/74691AT.pdf
+[5]:https://www.jameco.com/Jameco/Products/ProdDS/82472.pdf
