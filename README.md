@@ -126,8 +126,15 @@ References
 + TI 74LVC245 [datasheet][2]
 + Parallel RAM 62256 (32K x 8 bit) [datasheet][5]
 
+License
+-------
+The software and other files in this repository are released under what is commonly called the [MIT License][100]. See the file [`LICENSE`][101] in this repository.
+
+
 [1]:http://www.bgmicro.com/pdf/x28256.pdf
 [2]:https://www.ti.com/lit/ds/symlink/sn74lvc245a.pdf
 [3]:http://ww1.microchip.com/downloads/en/DeviceDoc/doc0006.pdf
 [4]:https://www.jameco.com/Jameco/Products/ProdDS/74691AT.pdf
 [5]:https://www.jameco.com/Jameco/Products/ProdDS/82472.pdf
+[100]: https://choosealicense.com/licenses/mit/
+[101]: ./LICENSE
