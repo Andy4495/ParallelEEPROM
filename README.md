@@ -1,5 +1,4 @@
-ParallelEEPROM Library
-==========================
+# ParallelEEPROM Library
 
 This is a parallel EEPROM programmer library. It currently supports 32Kx8 (28C256 and X28256) and 2Kx8 (28C16) EEPROMs. 32Kx8 and 2Kx8 chips with the same pinout as these devices have not been tested, but will probably work with this library. Other sizes may be supported in the future.  
 
@@ -17,80 +16,90 @@ DATA polling uses the most significant data bit (IO7) to signal when a write ope
 
 The library currently supports single-byte reads and writes. Future updates may include support for multi-byte reads and page writes.
 
-Usage
------
+## Usage
 
 _Be sure to review the example sketches included with the library._
 
 First, **include** the library header file:
 
-    #include <ParallelEEPROM.h>
+```cpp
+#include <ParallelEEPROM.h>
+```
 
 Next, **instantiate** an ParallelEEPROM object. The constructor used depends on the EEPROM type and whether you are using a 74LVC245 or similar transceiver on the data lines:
 
 1. 32KB device (28C256/X28256) with 74LVC245:
-```
+
+    ```cpp
     ParallelEEPROM eep(byte A14, byte A13, byte A12, byte A11, byte A10, byte A9, byte A8,
                        byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
                        byte  D7, byte  D6, byte  D5, byte  D4, byte  D3, byte D2, byte D1, byte D0,
                        byte  EEPROM_CE, byte EEPROM_OE, byte EEPROM_WE,
                        byte  245_OE, byte 245_DIR);
-```
+    ```
 
 2. 2KB device (28C16) with 74LVC245:
-```
+
+    ```cpp
     ParallelEEPROM eep(byte A10, byte A9, byte A8,
                        byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
                        byte  D7, byte  D6, byte  D5, byte  D4, byte  D3, byte D2, byte D1, byte D0,
                        byte  EEPROM_CE, byte EEPROM_OE, byte EEPROM_WE,
                        byte  245_OE, byte 245_DIR);
-```
+    ```
 
 3. 32KB device (28C256/X28256) without 74LVC245:
-```
+
+    ```cpp
     ParallelEEPROM eep(byte A14, byte A13, byte A12, byte A11, byte A10, byte A9, byte A8,
                        byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
                        byte  D7, byte  D6, byte  D5, byte  D4, byte  D3, byte D2, byte D1, byte D0,
                        byte  EEPROM_CE, byte EEPROM_OE, byte EEPROM_WE);
-```
+    ```
 
 4. 2KB device (28C16) without 74LVC245:
-```
+
+    ```cpp
     ParallelEEPROM eep(byte A10, byte A9, byte A8,
                        byte  A7, byte  A6, byte  A5, byte  A4, byte  A3, byte A2, byte A1, byte A0,
                        byte  D7, byte  D6, byte  D5, byte  D4, byte  D3, byte D2, byte D1, byte D0,
                        byte  EEPROM_CE, byte EEPROM_OE, byte EEPROM_WE);
-```
+    ```
 
-The constructor parameters are the pin numbers for up to 15 address pins on the EEPROM, 8 data pins 74LVC245 (B side) or directly connected to EEPROM, control pins for the EEPROM (CE, OE, WE), and control pins for the 74LVC245 (OE and DIR) if used. Note that the library assumes that the A side of the 74LVC245 is connected to the EEPROM, and the B side is connected to the MSP432.
+    The constructor parameters are the pin numbers for up to 15 address pins on the EEPROM, 8 data pins 74LVC245 (B side) or directly connected to EEPROM, control pins for the EEPROM (CE, OE, WE), and control pins for the 74LVC245 (OE and DIR) if used. Note that the library assumes that the A side of the 74LVC245 is connected to the EEPROM, and the B side is connected to the MSP432.
 
 Then **initialize** the object (typically within `setup()`):
 
-    eep.begin();
+```cpp
+eep.begin();
+```
 
-#### Library Methods ####
+### Library Methods
 
-    // No polling after a write. Use a hard-coded delay (per device datasheet) in sketch after write
-    void write(uint16_t address, byte data);
+```cpp
+// No polling after a write. Use a hard-coded delay (per device datasheet) in sketch after write
+void write(uint16_t address, byte data);
 
-    // Use DATA polling to automatically check if previous write completed before starting next write
-    void writeWithPolling(uint16_t address, byte data);
+// Use DATA polling to automatically check if previous write completed before starting next write
+void writeWithPolling(uint16_t address, byte data);
 
-    // Use TOGGLE polling to automatically check if previous write completed before starting next write
-    void writeWithTogglePolling(uint16_t address, byte data);
+// Use TOGGLE polling to automatically check if previous write completed before starting next write
+void writeWithTogglePolling(uint16_t address, byte data);
 
-    // No polling before a read. Make sure that sketch has proper delay after any previous write before reading data
-    byte read(uint16_t address);
+// No polling before a read. Make sure that sketch has proper delay after any previous write before reading data
+byte read(uint16_t address);
 
-    // Use DATA polling to automatically check if previous write completed before reading
-    byte readWithPolling(uint16_t address);
+// Use DATA polling to automatically check if previous write completed before reading
+byte readWithPolling(uint16_t address);
 
-    // Use TOGGLE polling to automatically check if previous write completed before reading
-    byte readWithTogglePolling(uint16_t address);
+// Use TOGGLE polling to automatically check if previous write completed before reading
+byte readWithTogglePolling(uint16_t address);
+```
 
-#### Hardware Notes ####
+### Hardware Notes
 
 Be sure to connect 10K pull-up resistors as follows:
+
 - /CE signal to +5V
   - 28C256/X28256 pin 20
   - 28C16 pin 18
@@ -100,9 +109,9 @@ Each chip should have a 0.1 uF decoupling capacitor connected between Vcc and GN
 
 When using a 74LVC245 or other transceiver, the library assumes that the A side of the 74LVC245 is connected to the EEPROM data lines, and the B side is connected to the microcontroller.
 
-
 In other words, connect as follows:
-```
+
+```text
 EEPROM Pin  74LVC245 Pin  Chip Signal Name
 ----------  ------------  ----------------
     19           2          I/O7 <-> A1
@@ -117,19 +126,17 @@ EEPROM Pin  74LVC245 Pin  Chip Signal Name
 
 In order to support both 28C256 and 28C16, the programming hardware needs to account for slightly different pinouts between the chips. In particular, the 28C256/X28256 has 28 pins and the 28C16 has 24. Pin 26 is an address pin on the 28C256/X28256, which corresponds to Vcc pin 24 on the 28C16. The programming hardware therefore has a jumper at pin 26/24 so that A13 can be selected when using a 28 pin device, and Vcc can be selected when using a 24 pin device.
 
-References
----------------------
+## References
 
-+ Xicor X28256 [datasheet][1]
-+ Atmel 28C256 [datasheet][3]
-+ Atmel 28C16 [datasheet][4]
-+ TI 74LVC245 [datasheet][2]
-+ Parallel RAM 62256 (32K x 8 bit) [datasheet][5]
+- Xicor X28256 [datasheet][1]
+- Atmel 28C256 [datasheet][3]
+- Atmel 28C16 [datasheet][4]
+- TI 74LVC245 [datasheet][2]
+- Parallel RAM 62256 (32K x 8 bit) [datasheet][5]
 
-License
--------
+## License
+
 The software and other files in this repository are released under what is commonly called the [MIT License][100]. See the file [`LICENSE`][101] in this repository.
-
 
 [1]:http://www.bgmicro.com/pdf/x28256.pdf
 [2]:https://www.ti.com/lit/ds/symlink/sn74lvc245a.pdf
@@ -138,3 +145,4 @@ The software and other files in this repository are released under what is commo
 [5]:https://www.jameco.com/Jameco/Products/ProdDS/82472.pdf
 [100]: https://choosealicense.com/licenses/mit/
 [101]: ./LICENSE
+[200]: https://github.com/Andy4495/ParallelEEPROM
