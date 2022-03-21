@@ -141,7 +141,7 @@ In order to support both 28C256 and 28C16, the programming hardware needs to acc
 
 The software and other files in this repository are released under what is commonly called the [MIT License][100]. See the file [`LICENSE`][101] in this repository.
 
-[1]:http://www.bgmicro.com/pdf/x28256.pdf
+[1]:./extras/hardware/Xicor%20x28256%20EEPROM.pdf
 [2]:https://www.ti.com/lit/ds/symlink/sn74lvc245a.pdf
 [3]:http://ww1.microchip.com/downloads/en/DeviceDoc/doc0006.pdf
 [4]:https://www.jameco.com/Jameco/Products/ProdDS/74691AT.pdf
@@ -149,3 +149,6 @@ The software and other files in this repository are released under what is commo
 [100]: https://choosealicense.com/licenses/mit/
 [101]: ./LICENSE
 [200]: https://github.com/Andy4495/ParallelEEPROM
+
+[//]: # (Dead link from older version of README: X28256 datasheet http://www.bgmicro.com/pdf/x28256.pdf)
+
