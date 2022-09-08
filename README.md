@@ -148,7 +148,6 @@ The software and other files in this repository are released under what is commo
 [5]:https://www.jameco.com/Jameco/Products/ProdDS/82472.pdf
 [100]: https://choosealicense.com/licenses/mit/
 [101]: ./LICENSE
-[200]: https://github.com/Andy4495/ParallelEEPROM
+[//]: # ([200]: https://github.com/Andy4495/ParallelEEPROM)
 
 [//]: # (Dead link from older version of README: X28256 datasheet http://www.bgmicro.com/pdf/x28256.pdf)
-
