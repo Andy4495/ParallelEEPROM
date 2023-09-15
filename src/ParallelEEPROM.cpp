@@ -288,7 +288,7 @@ byte ParallelEEPROM::readWithPolling(uint16_t address) {
     // Once bit 7 is correct, then write may proceed.
     while ((read(_lastAddressWritten) & 0x80) != (_lastByteWritten & 0x80) ) ;
   }
-  read(address);
+  return(read(address));
 }
 
 // This method uses Toggle Bit Polling to check if prevous write
@@ -309,7 +309,6 @@ byte ParallelEEPROM::readWithTogglePolling(uint16_t address) {
 }
 
 void ParallelEEPROM::setAddressLines(uint16_t address) {
-  int i;
 
   if (_Addr[14] != NO_PIN) (address & 0x4000) ? digitalWrite(_Addr[14], HIGH) : digitalWrite(_Addr[14], LOW);
   if (_Addr[13] != NO_PIN) (address & 0x2000) ? digitalWrite(_Addr[13], HIGH) : digitalWrite(_Addr[13], LOW);
