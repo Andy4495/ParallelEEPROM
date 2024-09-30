@@ -1,7 +1,7 @@
 # ParallelEEPROM Library
 
 [![Arduino Compile Sketches](https://github.com/Andy4495/ParallelEEPROM/actions/workflows/arduino-compile-sketches.yml/badge.svg)](https://github.com/Andy4495/ParallelEEPROM/actions/workflows/arduino-compile-sketches.yml)
-[![Check Markdown Links](https://github.com/Andy4495/ParallelEEPROM/actions/workflows/CheckMarkdownLinks.yml/badge.svg)](https://github.com/Andy4495/ParallelEEPROM/actions/workflows/CheckMarkdownLinks.yml)
+[![Check Markdown Links](https://github.com/Andy4495/ParallelEEPROM/actions/workflows/check-links.yml/badge.svg)](https://github.com/Andy4495/ParallelEEPROM/actions/workflows/check-links.yml)
 
 This is a parallel EEPROM programmer library. It currently supports 32Kx8 (28C256 and X28256) and 2Kx8 (28C16) EEPROMs. 32Kx8 and 2Kx8 chips with the same pinout as these devices have not been tested, but will probably work with this library. Other sizes may be supported in the future.  
 
